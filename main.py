@@ -211,8 +211,7 @@ def process_channel_line(line):
                 jlp_lines.append(process_name_string(line.strip()))
             elif channel_name in js_dictionary:  #解说
                 js_lines.append(process_name_string(line.strip()))
-            elif channel_name in mx_dictionary:  #明星
-		mx_lines.append(process_name_string(line.strip()))
+
 
             elif channel_name in shaoer_dictionary:  #少儿频道
                 shaoer_lines.append(process_name_string(line.strip()))
