@@ -33,12 +33,12 @@ http://gg.gg/tv-live-m3u
 |-------|------------------------------------------------|------------|
 | （txt） |  https://raw.githubusercontent.com/xuy132/collect-tv-txt/main/merged_output.txt | http://gg.gg/tv-live-txt   |
 | （m3u） |  https://raw.githubusercontent.com/xuy132/collect-tv-txt/main/merged_output.m3u | http://gg.gg/tv-live-m3u   |
-
-
 如果有其他定期更新稳定的源也可以留言，有时间一起加在收集列表里。
+
+
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=xuy132/collect-tv-txt&type=Date)](https://star-history.com/#xuy132/collect-tv-txt&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=xuy132/AUTO-IPTV-URL&type=Date)](https://star-history.com/#xuy132/AUTO-IPTV-URL&Date)
 
 
 
