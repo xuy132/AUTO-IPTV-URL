@@ -249,7 +249,7 @@ def process_channel_line(line):
             elif channel_name in shanxi_dictionary:  #地方台-陕西频道
                 shanxi_lines.append(process_name_string(line.strip()))
             elif channel_name in sx_dictionary:  #地方台-山西频道
-                sc_lines.append(process_name_string(line.strip()))
+                sx_lines.append(process_name_string(line.strip()))
             elif channel_name in sd_dictionary:  #地方台-山东频道
                 sd_lines.append(process_name_string(line.strip()))
             elif channel_name in yn_dictionary:  #地方台-云南频道
