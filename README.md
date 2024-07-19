@@ -1,5 +1,5 @@
 #AUTO-IPTV-URL
-感谢kimwang1978分享https://github.com/kimwang1978/AUTO-IPTV-URL
+感谢kimwang1978分享https://github.com/kimwang1978/collect-tv-txt
 
 
 
