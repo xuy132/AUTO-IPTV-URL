@@ -7,37 +7,29 @@ from datetime import datetime
 # 定义要访问的多个URL
 urls = [
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u',
-    'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn_112114.m3u',
-    'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn_cctv.m3u',
-    'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn_cgtn.m3u',
-    'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn_yeslivetv.m3u',
+    'https://raw.githubusercontent.com/joevess/IPTV/main/iptv.m3u8',
+    'https://raw.githubusercontent.com/Supprise0901/TVBox_live/main/live.txt',
+    'https://raw.githubusercontent.com/gdstchdr1/IPTV/main/bc.txt',
+    'https://raw.githubusercontent.com/Guovin/TV/gd/result.txt', #每天自动更新1次
+    'https://raw.githubusercontent.com/ssili126/tv/main/itvlist.txt', #每天自动更新1次
     'https://raw.githubusercontent.com/vicjl/myIPTV/main/IPTV-all.m3u', #内含成人视频 cdn.jsdelivr.net/gh/vicjl/myIPTV/
     'https://raw.githubusercontent.com/Moexin/IPTV/Files/IPTV.m3u', #内含成人视频 
     'https://raw.githubusercontent.com/skddyj/iptv/main/IPTV.m3u',
     'https://raw.githubusercontent.com/wwb521/live/main/tv.m3u',
-    'https://raw.githubusercontent.com/zhumeng11/IPTV/main/IPTV.m3u',
-    'https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u',
-    'https://raw.githubusercontent.com/joevess/IPTV/main/iptv.m3u8',
+    'https://raw.githubusercontent.com/lalifeier/IPTV/main/txt/IPTV.txt',
     'https://raw.githubusercontent.com/hujingguang/ChinaIPTV/main/cnTV_AutoUpdate.m3u8', #15分钟更新1次
-    'https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u',
-    'https://raw.githubusercontent.com/Supprise0901/TVBox_live/main/live.txt',
-    'https://raw.githubusercontent.com/Guovin/TV/gd/result.txt', #每天自动更新1次
-    'https://raw.githubusercontent.com/ssili126/tv/main/itvlist.txt', #每天自动更新1次
     'https://m3u.ibert.me/txt/fmml_ipv6.txt',
     'https://m3u.ibert.me/txt/ycl_iptv.txt',
     'https://m3u.ibert.me/txt/y_g.txt',
     'https://m3u.ibert.me/txt/j_home.txt',
     'https://raw.githubusercontent.com/gaotianliuyun/gao/master/list.txt',
     'https://gitee.com/xxy002/zhiboyuan/raw/master/zby.txt',
-    'https://raw.githubusercontent.com/yoursmile66/TVBox/main/live.txt',
     'https://raw.githubusercontent.com/mlvjfchen/TV/main/iptv_list.txt', #每天早晚各自动更新1次 2024-06-03 17:50
     'https://raw.githubusercontent.com/fenxp/iptv/main/live/ipv6.txt',  #1小时自动更新1次11:11 2024/05/13
     'https://raw.githubusercontent.com/fenxp/iptv/main/live/tvlive.txt', #1小时自动更新1次11:11 2024/05/13
     'https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt',  #每天自动更新1次 2024-06-24 16:37
     'https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt',
-    'https://raw.githubusercontent.com/liu673cn/box/08aa2e6f742d8bd267cf2b118baa6792bbdca2d5/libs/tv/tvzb.txt',
-    'https://raw.githubusercontent.com/asiaboke/IPTV/97dc264f71b16c470180b574f8a434c925014245/mtvzb.txt',
-    'https://raw.githubusercontent.com/wwb521/live/main/tv.txt'
+    'https://raw.githubusercontent.com/yoursmile66/TVBox/main/live.txt'
 ]
 
 #read BlackList 2024-06-17 15:02
@@ -54,16 +46,15 @@ combined_blacklist = list(set(blacklist_auto + blacklist_manual))
 
 # 定义多个对象用于存储不同内容的行文本
 ys_lines = [] #CCTV
-dj_lines = [] #DJ舞曲
-mtv_lines = [] #MTV
+#dj_lines = [] #DJ舞曲
+#mtv_lines = [] #MTV
 cw_lines = [] #春晚
 dsj_lines = [] #电视剧
 dy_lines = [] #电影频道
 gagj_lines = [] #港澳国际
-hgnt_lines = [] #韩国女团
-gagj_lines = [] #港澳国际
+#hgnt_lines = [] #韩国女团
 jlp_lines = [] #记录片
-js_lines = [] #解说
+jsh_lines = [] #解说
 mx_lines = [] #明星
 sr_lines = [] #少儿频道
 sjzb_lines = [] #实景直播
@@ -208,12 +199,12 @@ def process_channel_line(line):
                 sr_lines.append(process_name_string(line.strip()))
             elif channel_name in jlp_dictionary:  #纪录片
                 jlp_lines.append(process_name_string(line.strip()))
-            elif channel_name in dj_dictionary:  #dj舞曲
-                dj_lines.append(process_name_string(line.strip()))
+            #elif channel_name in dj_dictionary:  #dj舞曲
+                #dj_lines.append(process_name_string(line.strip()))
             elif channel_name in xq_dictionary:  #戏曲
                 xq_lines.append(process_name_string(line.strip()))
-            elif channel_name in js_dictionary:  #解说
-                js_lines.append(process_name_string(line.strip()))
+            elif channel_name in jsh_dictionary:  #解说
+                jsh_lines.append(process_name_string(line.strip()))
             elif channel_name in cw_dictionary:  #春晚
                 cw_lines.append(process_name_string(line.strip()))
             elif channel_name in mx_dictionary:  #明星
@@ -222,10 +213,10 @@ def process_channel_line(line):
                 ztp_lines.append(process_name_string(line.strip()))
             elif channel_name in zy_dictionary:  #综艺频道
                 zy_lines.append(process_name_string(line.strip()))
-            elif channel_name in mtv_dictionary:  #MTV
-                mtv_lines.append(process_name_string(line.strip()))
-            elif channel_name in hgnt_dictionary:  #韩国女团
-                hgnt_lines.append(process_name_string(line.strip()))
+            #elif channel_name in mtv_dictionary:  #MTV
+                #mtv_lines.append(process_name_string(line.strip()))
+            #elif channel_name in hgnt_dictionary:  #韩国女团
+                #hgnt_lines.append(process_name_string(line.strip()))
             elif channel_name in yslb_dictionary:  #影视轮播
                 yslb_lines.append(process_name_string(line.strip()))
             elif channel_name in game_dictionary:  #游戏频道
@@ -337,13 +328,13 @@ def read_txt_to_array(file_name):
         return []
 #读取文本
 ys_dictionary=read_txt_to_array('主频道/CCTV.txt') #仅排序用
-dj_dictionary=read_txt_to_array('主频道/DJ舞曲.txt') #过滤+排序
-mtv_dictionary=read_txt_to_array('主频道/MTV.txt') #过滤+排序
+#dj_dictionary=read_txt_to_array('主频道/DJ舞曲.txt') #过滤+排序
+#mtv_dictionary=read_txt_to_array('主频道/MTV.txt') #过滤+排序
 cw_dictionary=read_txt_to_array('主频道/春晚.txt') #过滤+排序
 dsj_dictionary=read_txt_to_array('主频道/电视剧.txt') #过滤
 dy_dictionary=read_txt_to_array('主频道/电影.txt') #过滤
 gagj_dictionary=read_txt_to_array('主频道/港澳国际.txt') #过滤
-hgnt_dictionary=read_txt_to_array('主频道/韩国女团.txt') #过滤
+#hgnt_dictionary=read_txt_to_array('主频道/韩国女团.txt') #过滤
 jlp_dictionary=read_txt_to_array('主频道/纪录片.txt') #过滤
 js_dictionary=read_txt_to_array('主频道/解说频道.txt') #过滤
 mx_dictionary=read_txt_to_array('主频道/明星.txt') #过滤
@@ -485,9 +476,6 @@ all_lines =  ["更新时间,#genre#"] +[version] + ['\n'] +\
              ["港澳国际,#genre#"] + sort_data(gagj_dictionary,set(correct_name_data(corrections_name,gagj_lines))) + ['\n'] + \
              ["体育频道,#genre#"] + sort_data(ty_dictionary,set(correct_name_data(corrections_name,ty_lines))) + ['\n'] + \
              ["纪录片,#genre#"] + sort_data(jlp_dictionary,set(correct_name_data(corrections_name,jlp_lines)))+ ['\n'] + \
-             ["DJ舞曲,#genre#"] + sorted(set(dj_lines)) + ['\n'] + \
-             ["MTV,#genre#"] + sorted(set(mtv_lines)) + ['\n'] + \
-             ["韩国女团,#genre#"] + sorted(set(hgnt_lines)) + ['\n'] + \
              ["戏曲频道,#genre#"] + sort_data(xq_dictionary,set(correct_name_data(corrections_name,xq_lines))) + ['\n'] + \
              ["解说频道,#genre#"] + sorted(set(js_lines)) + ['\n'] + \
              ["综艺频道,#genre#"] + sorted(set(correct_name_data(corrections_name,zy_lines))) + ['\n'] + \
