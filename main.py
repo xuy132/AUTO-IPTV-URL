@@ -9,15 +9,8 @@ urls = [
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u',
     'https://raw.githubusercontent.com/joevess/IPTV/main/iptv.m3u8',
     'https://raw.githubusercontent.com/Supprise0901/TVBox_live/main/live.txt',
-    'https://raw.githubusercontent.com/gdstchdr1/IPTV/main/bc.txt',
     'https://raw.githubusercontent.com/Guovin/TV/gd/result.txt', #每天自动更新1次
     'https://raw.githubusercontent.com/ssili126/tv/main/itvlist.txt', #每天自动更新1次
-    'https://raw.githubusercontent.com/vicjl/myIPTV/main/IPTV-all.m3u', #内含成人视频 cdn.jsdelivr.net/gh/vicjl/myIPTV/
-    'https://raw.githubusercontent.com/Moexin/IPTV/Files/IPTV.m3u', #内含成人视频 
-    'https://raw.githubusercontent.com/skddyj/iptv/main/IPTV.m3u',
-    'https://raw.githubusercontent.com/wwb521/live/main/tv.m3u',
-    'https://raw.githubusercontent.com/lalifeier/IPTV/main/txt/IPTV.txt',
-    'https://raw.githubusercontent.com/hujingguang/ChinaIPTV/main/cnTV_AutoUpdate.m3u8', #15分钟更新1次
     'https://m3u.ibert.me/txt/fmml_ipv6.txt',
     'https://m3u.ibert.me/txt/ycl_iptv.txt',
     'https://m3u.ibert.me/txt/y_g.txt',
@@ -29,7 +22,15 @@ urls = [
     'https://raw.githubusercontent.com/fenxp/iptv/main/live/tvlive.txt', #1小时自动更新1次11:11 2024/05/13
     'https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt',  #每天自动更新1次 2024-06-24 16:37
     'https://gitlab.com/p2v5/wangtv/-/raw/main/lunbo.txt',
-    'https://raw.githubusercontent.com/yoursmile66/TVBox/main/live.txt'
+     'https://raw.githubusercontent.com/gdstchdr1/IPTV/main/bc.txt',
+    'https://raw.githubusercontent.com/vicjl/myIPTV/main/IPTV-all.m3u', #内含成人视频 cdn.jsdelivr.net/gh/vicjl/myIPTV/
+    'https://raw.githubusercontent.com/Moexin/IPTV/Files/IPTV.m3u', #内含成人视频 
+    'https://raw.githubusercontent.com/skddyj/iptv/main/IPTV.m3u',
+    'https://raw.githubusercontent.com/wwb521/live/main/tv.m3u',
+    'https://raw.githubusercontent.com/lalifeier/IPTV/main/txt/IPTV.txt',
+    'https://raw.githubusercontent.com/yoursmile66/TVBox/main/live.txt',
+    'https://raw.githubusercontent.com/hujingguang/ChinaIPTV/main/cnTV_AutoUpdate.m3u8', #15分钟更新1次
+    'https://raw.githubusercontent.com/PizazzGY/TVBox/main/live.txt'  #ADD 2024-07-22 13:50
 ]
 
 #read BlackList 2024-06-17 15:02
@@ -45,30 +46,30 @@ blacklist_manual=read_blacklist_from_txt('blacklist/blacklist_manual.txt')
 combined_blacklist = list(set(blacklist_auto + blacklist_manual))
 
 # 定义多个对象用于存储不同内容的行文本
+sh_lines = []
 ys_lines = [] #CCTV
-#dj_lines = [] #DJ舞曲
-#mtv_lines = [] #MTV
-cw_lines = [] #春晚
-dsj_lines = [] #电视剧
-dy_lines = [] #电影频道
-gagj_lines = [] #港澳国际
-#hgnt_lines = [] #韩国女团
-jlp_lines = [] #记录片
-js_lines = [] #解说
-mx_lines = [] #明星
-sr_lines = [] #少儿频道
-sjzb_lines = [] #实景直播
-radio_lines = [] #收音机频道
-ty_lines = [] #体育频道
 ws_lines = [] #卫视频道
+ty_lines = [] #体育频道
+dy_lines = []
+dsj_lines = []
+gat_lines = [] #港澳台
+gj_lines = [] #国际台
+jlp_lines = [] #记录片
+dhp_lines = [] #动画片
 xq_lines = [] #戏曲
-yslb_lines = [] #影视轮播
-game_lines = [] #游戏频道
+js_lines = [] #解说
+cw_lines = [] #春晚
+mx_lines = [] #明星
 ztp_lines = [] #主题片
+zb_lines = [] #实景直播
 zy_lines = [] #综艺频道
+yy_lines = [] #音乐频道
+game_lines = [] #游戏频道
+radio_lines = [] #收音机频道
 
 ah_lines = [] #地方台-安徽频道
 bj_lines = [] #地方台-北京频道
+cq_lines = [] #地方台-重庆频道
 fj_lines = [] #地方台-福建频道
 gs_lines = [] #地方台-甘肃频道
 gd_lines = [] #地方台-广东频道
@@ -174,6 +175,19 @@ def convert_m3u_to_txt(m3u_content):
     # 将结果合并成一个字符串，以换行符分隔
     return '\n'.join(txt_lines)
 
+# 在list是否已经存在url 2024-07-22 11:18
+def check_url_existence(data_list, url):
+    """
+    Check if a given URL exists in a list of data.
+
+    :param data_list: List of strings containing the data
+    :param url: The URL to check for existence
+    :return: True if the URL exists in the list, otherwise False
+    """
+    # Extract URLs from the data list
+    urls = [item.split(',')[1] for item in data_list]
+    return url not in urls #如果不存在则返回true，需要
+
 # 分发直播源，归类，把这部分从process_url剥离出来，为以后加入whitelist源清单做准备。
 def process_channel_line(line):
     if  "#genre#" not in line and "," in line and "://" in line:
@@ -181,107 +195,103 @@ def process_channel_line(line):
         channel_address=line.split(',')[1].strip()
         if channel_address not in combined_blacklist: # 判断当前源是否在blacklist中
             # 根据行内容判断存入哪个对象，开始分发
-            if "CCTV" in channel_name: #央视频道
+            if "CCTV" in channel_name and check_url_existence(ys_lines, channel_address) : #央视频道
                 ys_lines.append(process_name_string(line.strip()))
-            elif channel_name in ws_dictionary: #卫视频道
+            elif channel_name in ws_dictionary and check_url_existence(ws_lines, channel_address): #卫视频道
                 ws_lines.append(process_name_string(line.strip()))
-            elif channel_name in  ty_dictionary:  #体育频道
+            elif channel_name in ty_dictionary and check_url_existence(ty_lines, channel_address):  #体育频道
                 ty_lines.append(process_name_string(line.strip()))
-            elif channel_name in dy_dictionary:  #电影频道
+            elif channel_name in dy_dictionary and check_url_existence(dy_lines, channel_address):  #电影频道
                 dy_lines.append(process_name_string(line.strip()))
-            elif channel_name in dsj_dictionary:  #电视剧频道
+            elif channel_name in dsj_dictionary and check_url_existence(dsj_lines, channel_address):  #电视剧频道
                 dsj_lines.append(process_name_string(line.strip()))
-            elif channel_name in sjzb_dictionary:  #实景直播
-                sjzb_lines.append(process_name_string(line.strip()))
-            elif channel_name in gagj_dictionary:  #港澳台
-                gagj_lines.append(process_name_string(line.strip()))
-            elif channel_name in sr_dictionary:  #少儿频道
-                sr_lines.append(process_name_string(line.strip()))
-            elif channel_name in jlp_dictionary:  #纪录片
+            elif channel_name in gat_dictionary and check_url_existence(gat_lines, channel_address):  #港澳台
+                gat_lines.append(process_name_string(line.strip()))
+            elif channel_name in gj_dictionary and check_url_existence(gj_lines, channel_address):  #国际台
+                gj_lines.append(process_name_string(line.strip()))
+            elif channel_name in jlp_dictionary and check_url_existence(jlp_lines, channel_address):  #纪录片
                 jlp_lines.append(process_name_string(line.strip()))
-            #elif channel_name in dj_dictionary:  #dj舞曲
-                #dj_lines.append(process_name_string(line.strip()))
-            elif channel_name in xq_dictionary:  #戏曲
+            elif channel_name in dhp_dictionary and check_url_existence(dhp_lines, channel_address):  #动画片
+                dhp_lines.append(process_name_string(line.strip()))
+            elif channel_name in xq_dictionary and check_url_existence(xq_lines, channel_address):  #戏曲
                 xq_lines.append(process_name_string(line.strip()))
-            elif channel_name in js_dictionary:  #解说
+            elif channel_name in js_dictionary and check_url_existence(js_lines, channel_address):  #解说
                 js_lines.append(process_name_string(line.strip()))
-            elif channel_name in cw_dictionary:  #春晚
+            elif channel_name in cw_dictionary and check_url_existence(cw_lines, channel_address):  #春晚
                 cw_lines.append(process_name_string(line.strip()))
-            elif channel_name in mx_dictionary:  #明星
+            elif channel_name in mx_dictionary and check_url_existence(mx_lines, channel_address):  #明星
                 mx_lines.append(process_name_string(line.strip()))
-            elif channel_name in ztp_dictionary:  #主题片
+            elif channel_name in ztp_dictionary and check_url_existence(ztp_lines, channel_address):  #主题片
                 ztp_lines.append(process_name_string(line.strip()))
-            elif channel_name in zy_dictionary:  #综艺频道
+            elif channel_name in zb_dictionary and check_url_existence(zb_lines, channel_address):  #直播中国
+                zb_lines.append(process_name_string(line.strip()))
+            elif channel_name in zy_dictionary and check_url_existence(zy_lines, channel_address):  #综艺频道
                 zy_lines.append(process_name_string(line.strip()))
-            #elif channel_name in mtv_dictionary:  #MTV
-                #mtv_lines.append(process_name_string(line.strip()))
-            #elif channel_name in hgnt_dictionary:  #韩国女团
-                #hgnt_lines.append(process_name_string(line.strip()))
-            elif channel_name in yslb_dictionary:  #影视轮播
-                yslb_lines.append(process_name_string(line.strip()))
-            elif channel_name in game_dictionary:  #游戏频道
+            elif channel_name in yy_dictionary and check_url_existence(yy_lines, channel_address):  #音乐频道
+                yy_lines.append(process_name_string(line.strip()))
+            elif channel_name in game_dictionary and check_url_existence(game_lines, channel_address):  #游戏频道
                 game_lines.append(process_name_string(line.strip()))
-            elif channel_name in radio_dictionary:  #收音机频道
+            elif channel_name in radio_dictionary and check_url_existence(radio_lines, channel_address):  #收音机频道
                 radio_lines.append(process_name_string(line.strip()))
-            elif channel_name in ah_dictionary:  #地方台-安徽频道
+            elif channel_name in ah_dictionary and check_url_existence(ah_lines, channel_address):  #地方台-安徽频道
                 ah_lines.append(process_name_string(line.strip()))
-            elif channel_name in bj_dictionary:  #地方台-北京频道
+            elif channel_name in bj_dictionary and check_url_existence(bj_lines, channel_address):  #地方台-北京频道
                 bj_lines.append(process_name_string(line.strip()))
-            elif channel_name in cq_dictionary:  #地方台-重庆频道
+            elif channel_name in cq_dictionary and check_url_existence(cq_lines, channel_address):  #地方台-重庆频道
                 cq_lines.append(process_name_string(line.strip()))
-            elif channel_name in fj_dictionary:  #地方台-福建频道
+            elif channel_name in fj_dictionary and check_url_existence(fj_lines, channel_address):  #地方台-福建频道
                 fj_lines.append(process_name_string(line.strip()))
-            elif channel_name in gs_dictionary:  #地方台-甘肃频道
+            elif channel_name in gs_dictionary and check_url_existence(gs_lines, channel_address):  #地方台-甘肃频道
                 gs_lines.append(process_name_string(line.strip()))
-            elif channel_name in gd_dictionary:  #地方台-广东频道
+            elif channel_name in gd_dictionary and check_url_existence(gd_lines, channel_address):  #地方台-广东频道
                 gd_lines.append(process_name_string(line.strip()))
-            elif channel_name in gx_dictionary:  #地方台-广西频道
+            elif channel_name in gx_dictionary and check_url_existence(gx_lines, channel_address):  #地方台-广西频道
                 gx_lines.append(process_name_string(line.strip()))
-            elif channel_name in gz_dictionary:  #地方台-贵州频道
+            elif channel_name in gz_dictionary and check_url_existence(gz_lines, channel_address):  #地方台-贵州频道
                 gz_lines.append(process_name_string(line.strip()))
-            elif channel_name in hainan_dictionary:  #地方台-海南频道
+            elif channel_name in hainan_dictionary and check_url_existence(hainan_lines, channel_address):  #地方台-海南频道
                 hainan_lines.append(process_name_string(line.strip()))
-            elif channel_name in heb_dictionary:  #地方台-河北频道
+            elif channel_name in heb_dictionary and check_url_existence(heb_lines, channel_address):  #地方台-河北频道
                 heb_lines.append(process_name_string(line.strip()))
-            elif channel_name in hen_dictionary:  #地方台-河南频道
+            elif channel_name in hen_dictionary and check_url_existence(hen_lines, channel_address):  #地方台-河南频道
                 hen_lines.append(process_name_string(line.strip()))
-            elif channel_name in hlj_dictionary:  #地方台-黑龙江频道
+            elif channel_name in hlj_dictionary and check_url_existence(hlj_lines, channel_address):  #地方台-黑龙江频道
                 hlj_lines.append(process_name_string(line.strip()))
-            elif channel_name in hub_dictionary:  #地方台-湖北频道
+            elif channel_name in hub_dictionary and check_url_existence(hub_lines, channel_address):  #地方台-湖北频道
                 hub_lines.append(process_name_string(line.strip()))
-            elif channel_name in hun_dictionary:  #地方台-湖南频道
+            elif channel_name in hun_dictionary and check_url_existence(hun_lines, channel_address):  #地方台-湖南频道
                 hun_lines.append(process_name_string(line.strip()))
-            elif channel_name in jl_dictionary:  #地方台-吉林频道
+            elif channel_name in jl_dictionary and check_url_existence(jl_lines, channel_address):  #地方台-吉林频道
                 jl_lines.append(process_name_string(line.strip()))
-            elif channel_name in jsu_dictionary:  #地方台-江苏频道
+            elif channel_name in jsu_dictionary and check_url_existence(jsu_lines, channel_address):  #地方台-江苏频道
                 jsu_lines.append(process_name_string(line.strip()))
-            elif channel_name in jx_dictionary:  #地方台-江西频道
+            elif channel_name in jx_dictionary and check_url_existence(jx_lines, channel_address):  #地方台-江西频道
                 jx_lines.append(process_name_string(line.strip()))
-            elif channel_name in ln_dictionary:  #地方台-辽宁频道
+            elif channel_name in ln_dictionary and check_url_existence(ln_lines, channel_address):  #地方台-辽宁频道
                 ln_lines.append(process_name_string(line.strip()))
-            elif channel_name in nm_dictionary:  #地方台-内蒙频道
+            elif channel_name in nm_dictionary and check_url_existence(nm_lines, channel_address):  #地方台-内蒙频道
                 nm_lines.append(process_name_string(line.strip()))
-            elif channel_name in nx_dictionary:  #地方台-宁夏频道
+            elif channel_name in nx_dictionary and check_url_existence(nx_lines, channel_address):  #地方台-宁夏频道
                 nx_lines.append(process_name_string(line.strip()))
-            elif channel_name in qh_dictionary:  #地方台-青海频道
+            elif channel_name in qh_dictionary and check_url_existence(qh_lines, channel_address):  #地方台-青海频道
                 qh_lines.append(process_name_string(line.strip()))
-            elif channel_name in sd_dictionary:  #地方台-山东频道
+            elif channel_name in sd_dictionary and check_url_existence(sd_lines, channel_address):  #地方台-山东频道
                 sd_lines.append(process_name_string(line.strip()))
-            elif channel_name in sx_dictionary:  #地方台-山西频道
+            elif channel_name in sx_dictionary and check_url_existence(sx_lines, channel_address):  #地方台-山西频道
                 sx_lines.append(process_name_string(line.strip()))
-            elif channel_name in shanxi_dictionary:  #地方台-陕西频道
+            elif channel_name in shanxi_dictionary and check_url_existence(shanxi_lines, channel_address):  #地方台-陕西频道
                 shanxi_lines.append(process_name_string(line.strip()))
-            elif channel_name in sh_dictionary:  #地方台-上海频道
+            elif channel_name in sh_dictionary and check_url_existence(sh_lines, channel_address):  #地方台-上海频道
                 sh_lines.append(process_name_string(line.strip()))
-            elif channel_name in sc_dictionary:  #地方台-四川频道
+            elif channel_name in sc_dictionary and check_url_existence(sc_lines, channel_address):  #地方台-四川频道
                 sc_lines.append(process_name_string(line.strip()))
-            elif channel_name in tj_dictionary:  #地方台-天津频道
+            elif channel_name in tj_dictionary and check_url_existence(tj_lines, channel_address):  #地方台-天津频道
                 tj_lines.append(process_name_string(line.strip()))
-            elif channel_name in xj_dictionary:  #地方台-新疆频道
+            elif channel_name in xj_dictionary and check_url_existence(xj_lines, channel_address):  #地方台-新疆频道
                 xj_lines.append(process_name_string(line.strip()))
-            elif channel_name in yn_dictionary:  #地方台-云南频道
+            elif channel_name in yn_dictionary and check_url_existence(yn_lines, channel_address):  #地方台-云南频道
                 yn_lines.append(process_name_string(line.strip()))
-            elif channel_name in zj_dictionary:  #地方台-浙江频道
+            elif channel_name in zj_dictionary and check_url_existence(zj_lines, channel_address):  #地方台-浙江频道
                 zj_lines.append(process_name_string(line.strip()))
             else:
                 other_lines.append(line.strip())
@@ -328,27 +338,24 @@ def read_txt_to_array(file_name):
         return []
 #读取文本
 ys_dictionary=read_txt_to_array('主频道/CCTV.txt') #仅排序用
-#dj_dictionary=read_txt_to_array('主频道/DJ舞曲.txt') #过滤+排序
-#mtv_dictionary=read_txt_to_array('主频道/MTV.txt') #过滤+排序
-cw_dictionary=read_txt_to_array('主频道/春晚.txt') #过滤+排序
-dsj_dictionary=read_txt_to_array('主频道/电视剧.txt') #过滤
-dy_dictionary=read_txt_to_array('主频道/电影.txt') #过滤
-gagj_dictionary=read_txt_to_array('主频道/港澳国际.txt') #过滤
-#hgnt_dictionary=read_txt_to_array('主频道/韩国女团.txt') #过滤
-jlp_dictionary=read_txt_to_array('主频道/纪录片.txt') #过滤
-js_dictionary=read_txt_to_array('主频道/解说频道.txt') #过滤
-mx_dictionary=read_txt_to_array('主频道/明星.txt') #过滤
-sr_dictionary=read_txt_to_array('主频道/少儿频道.txt') #过滤
-sjzb_dictionary=read_txt_to_array('主频道/实景直播.txt') #过滤
-radio_dictionary=read_txt_to_array('主频道/收音机频道.txt') #过滤
+ws_dictionary=read_txt_to_array('主频道/卫视频道.txt') #过滤+排序
 ty_dictionary=read_txt_to_array('主频道/体育频道.txt') #过滤
-ws_dictionary=read_txt_to_array('主频道/卫视频道.txt') #过滤
+dy_dictionary=read_txt_to_array('主频道/电影.txt') #过滤
+dsj_dictionary=read_txt_to_array('主频道/电视剧.txt') #过滤
+gat_dictionary=read_txt_to_array('主频道/港澳台.txt') #过滤
+gj_dictionary=read_txt_to_array('主频道/国际台.txt') #过滤
+jlp_dictionary=read_txt_to_array('主频道/纪录片.txt') #过滤
+dhp_dictionary=read_txt_to_array('主频道/动画片.txt') #过滤
 xq_dictionary=read_txt_to_array('主频道/戏曲频道.txt') #过滤
-yslb_dictionary=read_txt_to_array('主频道/影视轮播.txt') #过滤
-game_dictionary=read_txt_to_array('主频道/游戏频道.txt') #过滤
+js_dictionary=read_txt_to_array('主频道/解说频道.txt') #过滤
+cw_dictionary=read_txt_to_array('主频道/春晚.txt') #过滤+排序
+mx_dictionary=read_txt_to_array('主频道/明星.txt') #过滤
 ztp_dictionary=read_txt_to_array('主频道/主题片.txt') #过滤
+zb_dictionary=read_txt_to_array('主频道/直播中国.txt') #过滤+排序
 zy_dictionary=read_txt_to_array('主频道/综艺频道.txt') #过滤
-
+yy_dictionary=read_txt_to_array('主频道/音乐频道.txt') #过滤
+game_dictionary=read_txt_to_array('主频道/游戏频道.txt') #过滤
+radio_dictionary=read_txt_to_array('主频道/收音机频道.txt') #过滤
 
 ah_dictionary=read_txt_to_array('地方台/安徽频道.txt') #过滤
 bj_dictionary=read_txt_to_array('地方台/北京频道.txt') #过滤
@@ -466,18 +473,18 @@ version=datetime.now().strftime("%Y%m%d-%H-%M-%S")+",url"
 all_lines =  ["更新时间,#genre#"] +[version] + ['\n'] +\
              ["央视频道,#genre#"] + sort_data(ys_dictionary,set(correct_name_data(corrections_name,ys_lines))) + ['\n'] + \
              ["卫视频道,#genre#"] + sort_data(ws_dictionary,set(correct_name_data(corrections_name,ws_lines))) + ['\n'] + \
-             ["实景直播,#genre#"] + sort_data(sjzb_dictionary,set(correct_name_data(corrections_name,sjzb_lines))) + ['\n'] + \
-             ["少儿频道,#genre#"] + sort_data(sr_dictionary,set(correct_name_data(corrections_name,sr_lines))) + ['\n'] + \
+             ["少儿频道,#genre#"] + sort_data(dhp_dictionary,set(correct_name_data(corrections_name,dhp_lines))) + ['\n'] + \
              ["电视剧,#genre#"] + sort_data(dsj_dictionary,set(correct_name_data(corrections_name,dsj_lines))) + ['\n'] + \
              ["主题片,#genre#"] + sort_data(ztp_dictionary,set(correct_name_data(corrections_name,ztp_lines))) + ['\n'] + \
              ["明星,#genre#"] + sort_data(mx_dictionary,set(correct_name_data(corrections_name,mx_lines))) + ['\n'] + \
              ["电影频道,#genre#"] + sort_data(dy_dictionary,set(correct_name_data(corrections_name,dy_lines))) + ['\n'] + \
-             ["影视轮播,#genre#"] + sort_data(yslb_dictionary,set(correct_name_data(corrections_name,yslb_lines))) + ['\n'] + \
-             ["港澳国际,#genre#"] + sort_data(gagj_dictionary,set(correct_name_data(corrections_name,gagj_lines))) + ['\n'] + \
+             ["港澳台,#genre#"] + sort_data(gat_dictionary,set(correct_name_data(corrections_name,gat_lines))) + ['\n'] + \
+             ["国际台,#genre#"] + sort_data(gj_dictionary,set(correct_name_data(corrections_name,gj_lines))) + ['\n'] + \
              ["体育频道,#genre#"] + sort_data(ty_dictionary,set(correct_name_data(corrections_name,ty_lines))) + ['\n'] + \
              ["纪录片,#genre#"] + sort_data(jlp_dictionary,set(correct_name_data(corrections_name,jlp_lines)))+ ['\n'] + \
              ["戏曲频道,#genre#"] + sort_data(xq_dictionary,set(correct_name_data(corrections_name,xq_lines))) + ['\n'] + \
              ["解说频道,#genre#"] + sorted(set(js_lines)) + ['\n'] + \
+             ["直播中国,#genre#"] + sorted(set(correct_name_data(corrections_name,zb_lines))) + ['\n'] + \
              ["综艺频道,#genre#"] + sorted(set(correct_name_data(corrections_name,zy_lines))) + ['\n'] + \
              ["游戏频道,#genre#"] + sorted(set(game_lines)) + ['\n'] + \
              ["安徽频道,#genre#"] + sorted(set(correct_name_data(corrections_name,ah_lines))) + ['\n'] + \
@@ -557,4 +564,3 @@ print("merged_output.m3u文件已生成。")
 #备用1：http://tonkiang.us
 #备用2：
 #备用3：
-
